@@ -1,0 +1,10 @@
+name: PHP Composer with Cache
+author: Sam Anthony
+
+runs:
+  using: "composite"
+  steps:
+    - name: Test
+      shell: bash
+      run: |
+        echo ${{ github.workflow_ref }}
