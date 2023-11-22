@@ -28,7 +28,13 @@ runs:
         
         CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK | md5sum | awk '{ print $1 }')
         echo "key=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
-        
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: /tmp/composer-cache
+        key: ${{ steps.cache-key.outputs.key }}
+
 #        WORKFLOW_FILE_PATH="$(echo '${{ github.workflow_ref }}' | cut -d'@' -f1)"
 #        echo $WORKFLOW_FILE_PATH
 #        echo $GITHUB_WORKFLOW_SHA
