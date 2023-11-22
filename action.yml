@@ -9,3 +9,4 @@ runs:
       run: |
         WORKFLOW_FILE_PATH="$(echo '${{ github.workflow_ref }}' | cut -d'@' -f1)"
         echo $WORKFLOW_FILE_PATH
+        echo $GITHUB_WORKFLOW_SHA
