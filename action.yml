@@ -17,6 +17,7 @@ runs:
   using: "composite"
   steps:
     - name: determine cache key
+      shell: bash
       id: cache-key
       run: |
         COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
