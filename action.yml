@@ -7,4 +7,5 @@ runs:
     - name: Test
       shell: bash
       run: |
-        echo ${{ github.workflow_ref }}
+        WORKFLOW_FILE_PATH="$(echo '${{ github.workflow_ref }}' | cut -d'@' -f1)"
+        echo $WORKFLOW_FILE_PATH
