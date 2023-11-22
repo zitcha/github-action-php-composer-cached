@@ -1,12 +1,49 @@
 name: PHP Composer with Cache
 author: Sam Anthony
 
+inputs:
+  composer-working-dir:
+    required: true
+    description: The folder containing the desired composer.json and composer.lock
+  dev:
+    required: true
+    description: Should composer dev packages be included (yes/no)
+    type: choice
+    options:
+      - yes
+      - no
+
 runs:
   using: "composite"
   steps:
-    - name: Test
-      shell: bash
+    - name: determine cache key
+      id: cache-key
       run: |
-        WORKFLOW_FILE_PATH="$(echo '${{ github.workflow_ref }}' | cut -d'@' -f1)"
-        echo $WORKFLOW_FILE_PATH
-        echo $GITHUB_WORKFLOW_SHA
+        COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
+        COMPOSER_LOCK=${{ inputs.composer-working-dir }}/composer.lock
+        ls -la
+        echo $COMPOSER_JSON
+        echo $COMPOSER_LOCK
+        
+        CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK | md5sum | awk '{ print $1 }')
+        echo "key=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
+        
+#        WORKFLOW_FILE_PATH="$(echo '${{ github.workflow_ref }}' | cut -d'@' -f1)"
+#        echo $WORKFLOW_FILE_PATH
+#        echo $GITHUB_WORKFLOW_SHA
+# TODO-SAM things to keep in cache key:
+#   - this file
+#   - the speicifc composer.lock
+#   - the speicifc conposer.json
+#   - any other inputs passed to this action (dev or non dev etc)
+
+#  https://github.com/php-actions/composer
+
+    - name: Install dependencies
+      uses: "php-actions/composer@v6"
+      with:
+        args: "--no-cache --ignore-platform-reqs --optimize-autoloader  "
+        interaction: no # --no-interaction
+        progress: no # --no-progress
+        dev: yes # TODO-SAM needs to be dynamic based on input.
+        working_dir: ${{ inputs.composer-working-dir }}
