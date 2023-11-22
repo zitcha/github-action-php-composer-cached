@@ -6,12 +6,12 @@ inputs:
     required: true
     description: The folder containing the desired composer.json and composer.lock
   dev:
-    required: true
+    default: no
     description: Should composer dev packages be included (yes/no)
     type: choice
     options:
-      - yes
       - no
+      - yes
 
 runs:
   using: "composite"
@@ -22,11 +22,13 @@ runs:
       run: |
         COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
         COMPOSER_LOCK=${{ inputs.composer-working-dir }}/composer.lock
+        COMPOSER_DEV=${{ inputs.dev }}
         ls -la
         echo $COMPOSER_JSON
         echo $COMPOSER_LOCK
+        echo $COMPOSER_DEV
         
-        CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK | md5sum | awk '{ print $1 }')
+        CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK $COMPOSER_DEV | md5sum | awk '{ print $1 }')
         echo "key=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
 
     - name: Cache Composer dependencies
