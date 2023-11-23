@@ -19,37 +19,24 @@ runs:
     - name: determine cache key
       shell: bash
       id: cache-key
+      # Why it is important to include "This file" in the Cache Key Hash?
+      #   If there is every a change to this action and the arguments passed to composer are changed, we want
+      #   to include this file in the hash to ensure that the Cache Key has changed.
       run: |
         COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
         COMPOSER_LOCK=${{ inputs.composer-working-dir }}/composer.lock
         COMPOSER_DEV=${{ inputs.dev }}
         THIS_FILE=${{ github.action_path }}/action.yml
-        ls -la
-        echo $COMPOSER_JSON
-        echo $COMPOSER_LOCK
-        echo $COMPOSER_DEV
-        echo $THIS_FILE
-        
         CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK $THIS_FILE | md5sum | awk '{ print $1 }')
         CACHE_KEY="$CACHE_KEY-$COMPOSER_DEV"
         echo "key=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
+        echo "Cache Key: $CACHE_KEY"
 
     - name: Cache Composer dependencies
       uses: actions/cache@v3
       with:
         path: ${{ inputs.composer-working-dir }}/vendor
         key: ${{ steps.cache-key.outputs.key }}
-
-#        WORKFLOW_FILE_PATH="$(echo '${{ github.workflow_ref }}' | cut -d'@' -f1)"
-#        echo $WORKFLOW_FILE_PATH
-#        echo $GITHUB_WORKFLOW_SHA
-# TODO-SAM things to keep in cache key:
-#   - this file
-#   - the speicifc composer.lock
-#   - the speicifc conposer.json
-#   - any other inputs passed to this action (dev or non dev etc)
-
-#  https://github.com/php-actions/composer
 
     - name: Install dependencies
       uses: "php-actions/composer@v6"
