@@ -23,7 +23,7 @@ runs:
         COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
         COMPOSER_LOCK=${{ inputs.composer-working-dir }}/composer.lock
         COMPOSER_DEV=${{ inputs.dev }}
-        THIS_FILE=${{ github.action_path }}/action/yml
+        THIS_FILE=${{ github.action_path }}/action.yml
         ls -la
         echo $COMPOSER_JSON
         echo $COMPOSER_LOCK
