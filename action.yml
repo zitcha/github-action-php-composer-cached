@@ -41,6 +41,13 @@ runs:
     - name: Install dependencies
       uses: "php-actions/composer@v6"
       with:
+        # Composer install flags
+        #   --no-dev: we dont need dev packages on production (This can be controlled via inputs.dev)
+        #   --no-cache: disable the built in composer cache. The composer cache would only be installed on the temp build environment
+        #     created by Github and the environment is destroyed immediately after, so this cache is useless
+        #   --ignore-platform-reqs: Since composer is been ran on Github build environment, and not the real environment,
+        #     we should ignore platform checks such as specific PHP Version or extensions
+        #   --optimize-autoloader: This value is already set in composer.json, but no harm in ensuring it is set here
         args: "--no-cache --ignore-platform-reqs --optimize-autoloader  "
         interaction: no # --no-interaction
         progress: no # --no-progress
