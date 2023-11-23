@@ -22,12 +22,16 @@ runs:
       # Why it is important to include "This file" in the Cache Key Hash?
       #   If there is every a change to this action and the arguments passed to composer are changed, we want
       #   to include this file in the hash to ensure that the Cache Key has changed.
+      # TODO
+      #  THIS_FILE=${{ github.action_path }}/action.yml
+      #  This file is not been used in the Cache Key Hash for the moment,
+      #  ${{ github.action_path }} didn't seem compatible with kirschbaumdevelopment/laravel-test-runner:8.1
+
       run: |
         COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
         COMPOSER_LOCK=${{ inputs.composer-working-dir }}/composer.lock
         COMPOSER_DEV=${{ inputs.dev }}
-        THIS_FILE=${{ github.action_path }}/action.yml
-        CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK $THIS_FILE | md5sum | awk '{ print $1 }')
+        CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK | md5sum | awk '{ print $1 }')
         CACHE_KEY="$CACHE_KEY-$COMPOSER_DEV"
         echo "key=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
         echo "Cache Key: $CACHE_KEY"
