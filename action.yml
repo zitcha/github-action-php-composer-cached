@@ -2,16 +2,19 @@ name: PHP Composer with Cache
 author: Sam Anthony
 
 inputs:
+  GITHUB_TOKEN:
+    description: Pass in the GITHUB_TOKEN
+    required: true
   composer-working-dir:
     required: true
     description: The folder containing the desired composer.json and composer.lock
-  dev:
-    default: no
-    description: Should composer dev packages be included (yes/no)
-    type: choice
+  nodev:
+    description: This argument is added to composer install
+    required: false
+    default: "--no-dev"
     options:
-      - no
-      - yes
+      - "--no-dev"
+      - ""
 
 runs:
   using: "composite"
@@ -44,18 +47,27 @@ runs:
         path: ${{ inputs.composer-working-dir }}/vendor
         key: ${{ steps.cache-key.outputs.key }}
 
-    - name: Install dependencies
-      uses: "php-actions/composer@v6"
-      with:
-        # Composer install flags
-        #   --no-dev: we dont need dev packages on production (This can be controlled via inputs.dev)
-        #   --no-cache: disable the built in composer cache. The composer cache would only be installed on the temp build environment
-        #     created by Github and the environment is destroyed immediately after, so this cache is useless
-        #   --ignore-platform-reqs: Since composer is been ran on Github build environment, and not the real environment,
-        #     we should ignore platform checks such as specific PHP Version or extensions
-        #   --optimize-autoloader: This value is already set in composer.json, but no harm in ensuring it is set here
-        args: "--no-cache --ignore-platform-reqs --optimize-autoloader  "
-        interaction: no # --no-interaction
-        progress: no # --no-progress
-        dev: ${{ inputs.dev }}
-        working_dir: ${{ inputs.composer-working-dir }}
+    # This helps prevent the occasional "composer install" error like:
+    # Failed to download xxxx/xxxxx from dist: Could not authenticate against github.com
+    - name: Composer Configure Auth
+      shell: bash
+      run: |
+        composer global config github-oauth.github.com ${{ inputs.GITHUB_TOKEN }}
+
+    - name: Composer install
+      shell: bash
+      # Composer install flags
+      #   --no-dev: we dont need dev packages on production (This can be controlled via inputs.nodev)
+      #   --no-cache: disable the built in composer cache. The composer cache would only be installed on the temp build environment
+      #     created by Github and the environment is destroyed immediately after, so this cache is useless
+      #   --ignore-platform-reqs: Since composer is been ran on Github build environment, and not the real environment,
+      #     we should ignore platform checks such as specific PHP Version or extensions
+      #   --optimize-autoloader: This value is already set in composer.json, but no harm in ensuring it is set here
+      #
+      # NOTE: the Github "if" is not available in custom composite actions, so that logic has been moved to the "run" command
+      # If there is a cache miss, then the "vendor" folder will not be present
+      # if: steps.composer-cache.outputs.cache-hit != 'true'
+      run: |
+        cd ${{ inputs.composer-working-dir }}
+        [ -d "vendor" ] && echo "vendor directory is present suggesting a cache hit" || composer install ${{ inputs.nodev }} --no-cache --no-progress --no-interaction --ignore-platform-reqs --optimize-autoloader
+
