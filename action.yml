@@ -23,12 +23,14 @@ runs:
         COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
         COMPOSER_LOCK=${{ inputs.composer-working-dir }}/composer.lock
         COMPOSER_DEV=${{ inputs.dev }}
+        THIS_FILE=${{ github.action_path }}/action/yml
         ls -la
         echo $COMPOSER_JSON
         echo $COMPOSER_LOCK
         echo $COMPOSER_DEV
+        echo $THIS_FILE
         
-        CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK | md5sum | awk '{ print $1 }')
+        CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK $THIS_FILE | md5sum | awk '{ print $1 }')
         CACHE_KEY="$CACHE_KEY-$COMPOSER_DEV"
         echo "key=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
 
