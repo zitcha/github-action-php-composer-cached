@@ -31,6 +31,8 @@ runs:
         COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
         COMPOSER_LOCK=${{ inputs.composer-working-dir }}/composer.lock
         COMPOSER_DEV=${{ inputs.dev }}
+        echo "Composer Working Dir: ${{ inputs.composer-working-dir }}"
+        ls -la ${{ inputs.composer-working-dir }}
         CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK | md5sum | awk '{ print $1 }')
         CACHE_KEY="$CACHE_KEY-$COMPOSER_DEV"
         echo "key=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
