@@ -5,23 +5,26 @@ Custom Github Actions must be in a public repository (Except when using Github E
 
 ### Github Action - PHP Composer Cached
 
-Simple Example:
+Example 1 - Include Dev Packages:
 
 ```
     steps:
       - name: Composer install with Cache
         uses: the-pistol/github-action-php-composer-cached@master
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           composer-working-dir: .
+          dev-option: "include-dev"
 ```
 
-Dev-only using a differnt path:
+Example 2 - Exclude Dev packages and use alternative path:
 
 ```
     steps:
       - name: Composer install with Cache
         uses: the-pistol/github-action-php-composer-cached@master
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           composer-working-dir: ./my-app  # Directly which contains composer.lock and composer.json
-          dev: yes  # install dev-only packages
+          dev-option: "exclude-dev"
 ```

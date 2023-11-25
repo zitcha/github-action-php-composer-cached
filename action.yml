@@ -32,18 +32,13 @@ runs:
       #  ${{ github.action_path }} didn't seem compatible with kirschbaumdevelopment/laravel-test-runner:8.1
 
       run: |
-        echo "exclude-dev:"
-        echo ${{ inputs.exclude-dev }}
-        echo ""
         COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
         COMPOSER_LOCK=${{ inputs.composer-working-dir }}/composer.lock
         DEV_OPTION=${{ inputs.dev-option }}
-        
-        echo "Composer Working Dir: ${{ inputs.composer-working-dir }}"
         echo "Composer Working Dir: ${{ inputs.composer-working-dir }}"
         ls -la ${{ inputs.composer-working-dir }}
         CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK | md5sum | awk '{ print $1 }')
-        CACHE_KEY="5-$CACHE_KEY-$DEV_OPTION"
+        CACHE_KEY="$CACHE_KEY-$DEV_OPTION"
         echo "key=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
         echo "Cache Key: $CACHE_KEY"
 
@@ -69,9 +64,6 @@ runs:
       #     we should ignore platform checks such as specific PHP Version or extensions
       #   --optimize-autoloader: This value is already set in composer.json, but no harm in ensuring it is set here
       #
-      # NOTE: the Github "if" is not available in custom composite actions, so that logic has been moved to the "run" command
-      # If there is a cache miss, then the "vendor" folder will not be present
-      # if: steps.composer-cache.outputs.cache-hit != 'true'
       run: |
         cd ${{ inputs.composer-working-dir }}
         
