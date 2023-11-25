@@ -8,6 +8,10 @@ inputs:
   composer-working-dir:
     required: true
     description: The folder containing the desired composer.json and composer.lock
+  include-dev:
+    description: Should dev packages be installed
+    type: boolean
+    require: true
   nodev:
     description: This argument is added to composer install
     required: false
@@ -31,6 +35,9 @@ runs:
       #  ${{ github.action_path }} didn't seem compatible with kirschbaumdevelopment/laravel-test-runner:8.1
 
       run: |
+        echo "include-dev:"
+        echo ${{ inputs.include-dev }}
+        echo ""
         COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
         COMPOSER_LOCK=${{ inputs.composer-working-dir }}/composer.lock
         COMPOSER_NODEV=${{ inputs.nodev }}
