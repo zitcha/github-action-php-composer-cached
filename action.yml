@@ -39,7 +39,7 @@ runs:
         echo "Composer Working Dir: ${{ inputs.composer-working-dir }}"
         ls -la ${{ inputs.composer-working-dir }}
         CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK | md5sum | awk '{ print $1 }')
-        CACHE_KEY="$CACHE_KEY-$EXCLUDE_DEV"
+        CACHE_KEY="5-$CACHE_KEY-$EXCLUDE_DEV"
         echo "key=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
         echo "Cache Key: $CACHE_KEY"
 
@@ -74,9 +74,9 @@ runs:
         
         if [ ${{ inputs.exclude-dev }} -eq "false" ]
         then
-          COMPOSER_NO_DEV=0
+          export COMPOSER_NO_DEV=0
         else
-          COMPOSER_NO_DEV=1
+          export COMPOSER_NO_DEV=1
         fi
         
         [ -d "vendor" ] && echo "vendor directory is present suggesting a cache hit" || composer install --no-cache --no-progress --no-interaction --ignore-platform-reqs --optimize-autoloader
