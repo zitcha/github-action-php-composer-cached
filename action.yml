@@ -8,17 +8,10 @@ inputs:
   composer-working-dir:
     required: true
     description: The folder containing the desired composer.json and composer.lock
-  include-dev:
+  exclude-dev:
     description: Should dev packages be installed
     type: boolean
     default: false
-  nodev:
-    description: This argument is added to composer install
-    required: false
-    default: "--no-dev"
-    options:
-      - "--no-dev"
-      - ""
 
 runs:
   using: "composite"
@@ -35,16 +28,18 @@ runs:
       #  ${{ github.action_path }} didn't seem compatible with kirschbaumdevelopment/laravel-test-runner:8.1
 
       run: |
-        echo "include-dev:"
-        echo ${{ inputs.include-dev }}
+        echo "exclude-dev:"
+        echo ${{ inputs.exclude-dev }}
         echo ""
         COMPOSER_JSON=${{ inputs.composer-working-dir }}/composer.json
         COMPOSER_LOCK=${{ inputs.composer-working-dir }}/composer.lock
-        COMPOSER_NODEV=${{ inputs.nodev }}
+        EXCLUDE_DEV=${{ inputs.exclude-dev }}
+        
+        echo "Composer Working Dir: ${{ inputs.composer-working-dir }}"
         echo "Composer Working Dir: ${{ inputs.composer-working-dir }}"
         ls -la ${{ inputs.composer-working-dir }}
-        CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK $COMPOSER_NODEV | md5sum | awk '{ print $1 }')
-        CACHE_KEY="3-$CACHE_KEY-$COMPOSER_NODEV"
+        CACHE_KEY=$(cat $COMPOSER_JSON $COMPOSER_LOCK | md5sum | awk '{ print $1 }')
+        CACHE_KEY="$CACHE_KEY-$EXCLUDE_DEV"
         echo "key=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
         echo "Cache Key: $CACHE_KEY"
 
@@ -76,5 +71,13 @@ runs:
       # if: steps.composer-cache.outputs.cache-hit != 'true'
       run: |
         cd ${{ inputs.composer-working-dir }}
-        [ -d "vendor" ] && echo "vendor directory is present suggesting a cache hit" || composer install ${{ inputs.nodev }} --no-cache --no-progress --no-interaction --ignore-platform-reqs --optimize-autoloader
+        
+        if [ ${{ inputs.exclude-dev }} -eq "false" ]
+        then
+          COMPOSER_NO_DEV=0
+        else
+          COMPOSER_NO_DEV=1
+        fi
+        
+        [ -d "vendor" ] && echo "vendor directory is present suggesting a cache hit" || composer install --no-cache --no-progress --no-interaction --ignore-platform-reqs --optimize-autoloader
 
