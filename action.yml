@@ -72,12 +72,14 @@ runs:
       run: |
         cd ${{ inputs.composer-working-dir }}
         
-        if [ ${{ inputs.exclude-dev }} -eq "false" ]
+        if [ "${{ inputs.exclude-dev }}: -eq "false" ]
         then
           export COMPOSER_NO_DEV=0
         else
           export COMPOSER_NO_DEV=1
         fi
+        
+        echo "composer no dev: $COMPOSER_NO_DEV"
         
         [ -d "vendor" ] && echo "vendor directory is present suggesting a cache hit" || composer install --no-cache --no-progress --no-interaction --ignore-platform-reqs --optimize-autoloader
 
