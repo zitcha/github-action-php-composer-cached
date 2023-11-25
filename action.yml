@@ -11,7 +11,7 @@ inputs:
   include-dev:
     description: Should dev packages be installed
     type: boolean
-    require: true
+    default: false
   nodev:
     description: This argument is added to composer install
     required: false
