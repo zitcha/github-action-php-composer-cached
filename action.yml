@@ -43,7 +43,7 @@ runs:
         echo "Cache Key: $CACHE_KEY"
 
     - name: Cache Composer dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ inputs.composer-working-dir }}/vendor
         key: ${{ steps.cache-key.outputs.key }}
