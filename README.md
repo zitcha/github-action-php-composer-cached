@@ -10,7 +10,7 @@ Example 1 - Include Dev Packages:
 ```
     steps:
       - name: Composer install with Cache
-        uses: the-pistol/github-action-php-composer-cached@v1.0.0
+        uses: zitcha/github-action-php-composer-cached@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           composer-working-dir: .
@@ -22,7 +22,7 @@ Example 2 - Exclude Dev packages and use alternative path:
 ```
     steps:
       - name: Composer install with Cache
-        uses: the-pistol/github-action-php-composer-cached@v1.0.0
+        uses: zitcha/github-action-php-composer-cached@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           composer-working-dir: ./my-app  # Directly which contains composer.lock and composer.json
